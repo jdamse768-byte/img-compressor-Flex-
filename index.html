@@ -1,0 +1,2259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Img-Compressor Flex — Advanced Image Compression</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* ===== RESET ===== */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  :root {
+    --blue-900: #0a2540;
+    --blue-700: #1a4d8f;
+    --blue-600: #2563eb;
+    --blue-500: #3b82f6;
+    --blue-100: #dbeafe;
+    --blue-50:  #eff6ff;
+    --white: #ffffff;
+    --gray-50: #f8fafc;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-400: #94a3b8;
+    --gray-500: #64748b;
+    --gray-700: #334155;
+    --gray-900: #0f172a;
+    --green-600: #059669;
+    --green-100: #d1fae5;
+    --amber-700: #b45309;
+    --amber-100: #fef3c7;
+    --red-500: #ef4444;
+    --shadow-sm: 0 1px 2px rgba(10,37,64,0.06);
+    --shadow-md: 0 4px 16px rgba(10,37,64,0.08);
+    --shadow-lg: 0 12px 40px rgba(10,37,64,0.12);
+    --shadow-xl: 0 24px 64px rgba(10,37,64,0.18);
+    --shadow-blue: 0 8px 24px rgba(37,99,235,0.25);
+  }
+
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: var(--white);
+    color: var(--gray-900);
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(circle at 15% 10%, rgba(59,130,246,0.06), transparent 45%),
+      radial-gradient(circle at 85% 90%, rgba(37,99,235,0.05), transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ===== NAVBAR ===== */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(10,37,64,0.06);
+  }
+
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Sora', sans-serif;
+    font-weight: 800;
+    font-size: 19px;
+    color: var(--blue-900);
+    letter-spacing: -0.02em;
+    text-decoration: none;
+  }
+
+  .logo-mark {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--blue-600), var(--blue-500));
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: var(--shadow-blue);
+    color: #fff;
+  }
+
+  .logo span { color: var(--blue-600); }
+
+  .nav-links {
+    display: flex;
+    gap: 32px;
+    list-style: none;
+    align-items: center;
+  }
+
+  .nav-links a {
+    text-decoration: none;
+    color: var(--gray-700);
+    font-size: 14.5px;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--blue-600); }
+
+  .nav-cta {
+    background: var(--blue-600);
+    color: #fff !important;
+    padding: 9px 20px;
+    border-radius: 10px;
+    font-weight: 600 !important;
+    box-shadow: var(--shadow-blue);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .nav-cta:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 28px rgba(37,99,235,0.35);
+  }
+
+  /* ===== HERO ===== */
+  .hero {
+    text-align: center;
+    padding: 80px 0 40px;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--blue-50);
+    color: var(--blue-700);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 7px 16px;
+    border-radius: 100px;
+    border: 1px solid var(--blue-100);
+    margin-bottom: 26px;
+  }
+
+  .badge .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--blue-500);
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 3px rgba(59,130,246,0.2); }
+    50% { box-shadow: 0 0 0 6px rgba(59,130,246,0.08); }
+  }
+
+  .hero h1 {
+    font-family: 'Sora', sans-serif;
+    font-size: clamp(34px, 5.5vw, 58px);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    color: var(--blue-900);
+    margin-bottom: 20px;
+  }
+
+  .hero h1 .accent {
+    background: linear-gradient(135deg, var(--blue-600), var(--blue-500));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .hero p {
+    font-size: 17.5px;
+    color: var(--gray-500);
+    max-width: 600px;
+    margin: 0 auto 42px;
+  }
+
+  /* ===== COMPRESSOR CARD ===== */
+  .compressor {
+    max-width: 900px;
+    margin: 0 auto;
+    background: var(--white);
+    border-radius: 24px;
+    padding: 36px;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid rgba(10,37,64,0.06);
+    position: relative;
+  }
+
+  .compressor::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: 24px;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(37,99,235,0.25), rgba(59,130,246,0.05), rgba(37,99,235,0.15));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .drop-zone {
+    display: block;
+    border: 2px dashed rgba(37,99,235,0.3);
+    border-radius: 16px;
+    padding: 48px 24px;
+    text-align: center;
+    cursor: pointer;
+    background: linear-gradient(180deg, var(--blue-50), #fbfdff);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .drop-zone:hover,
+  .drop-zone.dragover {
+    border-color: var(--blue-500);
+    background: linear-gradient(180deg, #e6f0ff, var(--blue-50));
+    transform: translateY(-2px);
+  }
+
+  .drop-zone input { display: none; }
+
+  .drop-icon {
+    width: 64px; height: 64px;
+    margin: 0 auto 18px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, var(--blue-600), var(--blue-500));
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: var(--shadow-blue);
+    transition: transform 0.3s;
+  }
+
+  .drop-zone:hover .drop-icon { transform: scale(1.06) rotate(-3deg); }
+
+  .drop-zone h3 {
+    font-family: 'Sora', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--blue-900);
+    margin-bottom: 6px;
+  }
+
+  .drop-zone p {
+    font-size: 13.5px;
+    color: var(--gray-500);
+  }
+
+  .drop-zone .formats {
+    display: inline-block;
+    margin-top: 14px;
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--blue-600);
+    background: var(--white);
+    padding: 5px 12px;
+    border-radius: 100px;
+    border: 1px solid var(--blue-100);
+    text-transform: uppercase;
+  }
+
+  /* ===== WORKSPACE ===== */
+  .workspace { display: none; margin-top: 28px; }
+  .workspace.active { display: block; animation: fadeUp 0.35s ease; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ===== TOOLBAR ===== */
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: var(--blue-50);
+    border: 1px solid var(--blue-100);
+    border-radius: 12px;
+    margin-bottom: 20px;
+    font-size: 13.5px;
+    color: var(--blue-700);
+    font-weight: 600;
+  }
+
+  .toolbar-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .mini-btn {
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--blue-100);
+    background: var(--white);
+    color: var(--blue-700);
+    font-family: 'Inter', sans-serif;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .mini-btn:hover {
+    background: var(--blue-600);
+    color: #fff;
+    border-color: var(--blue-600);
+  }
+
+  /* ===== MODE TABS ===== */
+  .mode-tabs {
+    display: inline-flex;
+    background: var(--gray-50);
+    border: 1px solid var(--gray-100);
+    padding: 4px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    gap: 3px;
+  }
+
+  .mode-tab {
+    padding: 8px 20px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-500);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .mode-tab:hover { color: var(--blue-600); }
+
+  .mode-tab.active {
+    background: var(--white);
+    color: var(--blue-600);
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* ===== IMAGE GRID ===== */
+  .image-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .image-card {
+    background: var(--white);
+    border: 1px solid var(--gray-100);
+    border-radius: 14px;
+    overflow: hidden;
+    transition: all 0.25s;
+    position: relative;
+    cursor: pointer;
+  }
+
+  .image-card:hover {
+    border-color: var(--blue-100);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+
+  .image-thumb-wrap {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .image-thumb {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    display: block;
+    background: var(--gray-50);
+    transition: transform 0.4s;
+  }
+
+  .image-card:hover .image-thumb { transform: scale(1.05); }
+
+  .image-thumb-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(10,37,64,0) 50%, rgba(10,37,64,0.65) 100%);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 12px;
+    opacity: 0;
+    transition: opacity 0.25s;
+    pointer-events: none;
+  }
+
+  .image-card:hover .image-thumb-overlay { opacity: 1; }
+
+  .compare-hint {
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(37,99,235,0.85);
+    padding: 5px 12px;
+    border-radius: 100px;
+    backdrop-filter: blur(8px);
+  }
+
+  .image-info {
+    padding: 12px;
+  }
+
+  .image-info .name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gray-700);
+    margin-bottom: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .image-info .size-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--gray-500);
+    margin-bottom: 3px;
+  }
+
+  .image-info .size-row .val { font-weight: 700; color: var(--gray-700); }
+  .image-info .size-row .new-val { color: var(--blue-600); font-weight: 700; }
+
+  .image-info .savings {
+    display: inline-block;
+    font-size: 10.5px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 100px;
+    margin-top: 6px;
+  }
+
+  .savings.good { color: var(--green-600); background: var(--green-100); }
+  .savings.bad { color: var(--amber-700); background: var(--amber-100); }
+
+  .remove-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.95);
+    border: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    opacity: 0;
+    color: var(--gray-500);
+    z-index: 2;
+  }
+
+  .image-card:hover .remove-btn { opacity: 1; }
+  .remove-btn:hover { background: var(--red-500); color: #fff; border-color: var(--red-500); }
+
+  /* ===== SETTINGS PANEL ===== */
+  .settings {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  @media (max-width: 640px) {
+    .settings { grid-template-columns: 1fr; }
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .field label {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--gray-700);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .field label span {
+    font-family: 'Sora', sans-serif;
+    color: var(--blue-600);
+    font-weight: 700;
+    font-size: 13px;
+    background: var(--blue-50);
+    padding: 2px 10px;
+    border-radius: 100px;
+    border: 1px solid var(--blue-100);
+  }
+
+  .field select,
+  .field input[type="number"],
+  .field input[type="text"] {
+    padding: 10px 14px;
+    border: 1.5px solid var(--gray-100);
+    border-radius: 10px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--gray-900);
+    background: var(--white);
+    transition: all 0.2s;
+    width: 100%;
+    outline: none;
+  }
+
+  .field select:focus,
+  .field input:focus {
+    border-color: var(--blue-500);
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+  }
+
+  .field-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .field-row input { flex: 1; }
+
+  .unit {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-500);
+    padding: 0 4px;
+  }
+
+  input[type="range"] {
+    width: 100%;
+    height: 6px;
+    border-radius: 100px;
+    background: var(--gray-100);
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+    outline: none;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--white);
+    border: 4px solid var(--blue-600);
+    box-shadow: 0 2px 8px rgba(37,99,235,0.35);
+    transition: transform 0.15s;
+  }
+
+  input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+
+  input[type="range"]::-moz-range-thumb {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--white);
+    border: 4px solid var(--blue-600);
+    box-shadow: 0 2px 8px rgba(37,99,235,0.35);
+    cursor: pointer;
+  }
+
+  .preset-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+
+  .preset {
+    padding: 6px 14px;
+    border-radius: 100px;
+    border: 1.5px solid var(--gray-100);
+    background: var(--white);
+    color: var(--gray-700);
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .preset:hover { border-color: var(--blue-500); color: var(--blue-600); }
+  .preset.active {
+    background: var(--blue-600);
+    color: #fff;
+    border-color: var(--blue-600);
+  }
+
+  /* ===== TOTALS ===== */
+  .totals {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin-top: 22px;
+    margin-bottom: 22px;
+  }
+
+  @media (max-width: 640px) {
+    .totals { grid-template-columns: 1fr; }
+  }
+
+  .total-card {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-100);
+    border-radius: 14px;
+    padding: 16px 18px;
+    transition: all 0.3s;
+  }
+
+  .total-card.highlight {
+    background: linear-gradient(135deg, var(--blue-50), #f0f7ff);
+    border-color: var(--blue-100);
+  }
+
+  .total-label {
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--gray-400);
+    margin-bottom: 4px;
+  }
+
+  .total-card.highlight .total-label { color: var(--blue-600); }
+
+  .total-value {
+    font-family: 'Sora', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--blue-900);
+  }
+
+  .total-card.highlight .total-value { color: var(--blue-700); }
+
+  /* ===== BUTTONS ===== */
+  .actions {
+    display: flex;
+    gap: 12px;
+  }
+
+  .btn {
+    flex: 1;
+    padding: 15px 24px;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-decoration: none;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--blue-600), var(--blue-500));
+    color: #fff;
+    box-shadow: var(--shadow-blue);
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 32px rgba(37,99,235,0.4);
+  }
+
+  .btn-primary:active:not(:disabled) { transform: translateY(0); }
+
+  .btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  .btn-ghost {
+    flex: 0 0 auto;
+    background: var(--white);
+    color: var(--blue-700);
+    border: 1.5px solid var(--blue-100);
+  }
+
+  .btn-ghost:hover {
+    background: var(--blue-50);
+    border-color: var(--blue-500);
+  }
+
+  /* ===== INFO NOTE ===== */
+  .info-note {
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: var(--blue-50);
+    border: 1px solid var(--blue-100);
+    border-radius: 12px;
+    font-size: 12.5px;
+    color: var(--blue-700);
+    line-height: 1.55;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .info-note svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+    stroke: var(--blue-600);
+  }
+
+  /* ==========================================================
+     COMPARISON MODAL
+  ========================================================== */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(10,37,64,0.75);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .modal-backdrop.active {
+    display: flex;
+    opacity: 1;
+  }
+
+  .modal {
+    background: var(--white);
+    border-radius: 20px;
+    max-width: 1100px;
+    width: 100%;
+    max-height: 92vh;
+    overflow: hidden;
+    box-shadow: var(--shadow-xl);
+    display: flex;
+    flex-direction: column;
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+  }
+
+  .modal-backdrop.active .modal { transform: scale(1); }
+
+  .modal-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--gray-100);
+    background: linear-gradient(180deg, #fbfdff, var(--white));
+  }
+
+  .modal-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--blue-900);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 60%;
+  }
+
+  .modal-close {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: 1px solid var(--gray-100);
+    background: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--gray-500);
+  }
+
+  .modal-close:hover {
+    background: var(--red-500);
+    color: #fff;
+    border-color: var(--red-500);
+  }
+
+  .modal-body {
+    padding: 24px;
+    overflow-y: auto;
+    flex: 1;
+  }
+
+  /* ===== COMPARISON SLIDER ===== */
+  .compare-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    border-radius: 14px;
+    overflow: hidden;
+    background: var(--gray-50);
+    border: 1px solid var(--gray-100);
+    user-select: none;
+    cursor: ew-resize;
+    aspect-ratio: 16 / 10;
+    max-height: 60vh;
+  }
+
+  .compare-wrap img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: var(--gray-50);
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  .compare-before {
+    z-index: 1;
+    clip-path: inset(0 50% 0 0);
+  }
+
+  .compare-after {
+    z-index: 2;
+    clip-path: inset(0 0 0 50%);
+  }
+
+  .compare-handle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 3px;
+    background: var(--white);
+    box-shadow: 0 0 12px rgba(10,37,64,0.35);
+    z-index: 10;
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  .compare-handle::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--white);
+    box-shadow: 0 4px 16px rgba(10,37,64,0.3);
+    border: 2px solid var(--blue-500);
+  }
+
+  .compare-handle::after {
+    content: '⇄';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--blue-600);
+    z-index: 1;
+  }
+
+  .compare-label {
+    position: absolute;
+    top: 16px;
+    padding: 6px 14px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    z-index: 5;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .compare-label.before {
+    left: 16px;
+    background: rgba(10,37,64,0.75);
+    color: #fff;
+  }
+
+  .compare-label.after {
+    right: 16px;
+    background: rgba(37,99,235,0.9);
+    color: #fff;
+  }
+
+  /* ===== MODAL STATS ===== */
+  .modal-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 24px;
+  }
+
+  @media (max-width: 640px) {
+    .modal-stats { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .modal-stat {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-100);
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+
+  .modal-stat.highlight {
+    background: linear-gradient(135deg, var(--blue-50), #f0f7ff);
+    border-color: var(--blue-100);
+  }
+
+  .modal-stat-label {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--gray-400);
+    margin-bottom: 4px;
+  }
+
+  .modal-stat.highlight .modal-stat-label { color: var(--blue-600); }
+
+  .modal-stat-value {
+    font-family: 'Sora', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--blue-900);
+  }
+
+  .modal-stat.highlight .modal-stat-value { color: var(--blue-700); }
+
+  .modal-stat-value.saving {
+    color: var(--green-600);
+  }
+
+  /* ===== MODAL FOOTER ===== */
+  .modal-foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-top: 1px solid var(--gray-100);
+    background: var(--gray-50);
+    gap: 12px;
+  }
+
+  .modal-foot-info {
+    font-size: 12.5px;
+    color: var(--gray-500);
+    font-weight: 500;
+  }
+
+  .modal-foot-actions {
+    display: flex;
+    gap: 10px;
+  }
+
+  .modal-btn {
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .modal-btn.primary {
+    background: linear-gradient(135deg, var(--blue-600), var(--blue-500));
+    color: #fff;
+    box-shadow: var(--shadow-blue);
+  }
+
+  .modal-btn.primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 28px rgba(37,99,235,0.4);
+  }
+
+  .modal-btn.ghost {
+    background: var(--white);
+    color: var(--blue-700);
+    border: 1.5px solid var(--blue-100);
+  }
+
+  .modal-btn.ghost:hover {
+    background: var(--blue-50);
+    border-color: var(--blue-500);
+  }
+
+  /* ===== ZOOM CONTROLS ===== */
+  .zoom-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--white);
+    border: 1px solid var(--gray-100);
+    border-radius: 100px;
+    padding: 4px;
+  }
+
+  .zoom-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: var(--gray-500);
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .zoom-btn:hover {
+    background: var(--blue-50);
+    color: var(--blue-600);
+  }
+
+  .zoom-level {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--gray-700);
+    padding: 0 8px;
+    font-family: 'Sora', sans-serif;
+    min-width: 44px;
+    text-align: center;
+  }
+
+  /* ===== FEATURES ===== */
+  .features { padding: 90px 0 40px; }
+
+  .section-head {
+    text-align: center;
+    margin-bottom: 56px;
+  }
+
+  .section-head h2 {
+    font-family: 'Sora', sans-serif;
+    font-size: clamp(26px, 4vw, 38px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--blue-900);
+    margin-bottom: 12px;
+  }
+
+  .section-head p {
+    color: var(--gray-500);
+    font-size: 16px;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+  }
+
+  .feature-card {
+    background: var(--white);
+    border: 1px solid var(--gray-100);
+    border-radius: 18px;
+    padding: 28px 24px;
+    transition: all 0.3s ease;
+  }
+
+  .feature-card:hover {
+    border-color: var(--blue-100);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .feature-icon {
+    width: 48px; height: 48px;
+    border-radius: 13px;
+    background: var(--blue-50);
+    border: 1px solid var(--blue-100);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 18px;
+    transition: all 0.3s;
+  }
+
+  .feature-card:hover .feature-icon {
+    background: linear-gradient(135deg, var(--blue-600), var(--blue-500));
+    border-color: transparent;
+    transform: rotate(-4deg) scale(1.05);
+  }
+
+  .feature-card:hover .feature-icon svg { stroke: #fff; }
+
+  .feature-icon svg { stroke: var(--blue-600); transition: stroke 0.3s; }
+
+  .feature-card h3 {
+    font-family: 'Sora', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--blue-900);
+    margin-bottom: 8px;
+  }
+
+  .feature-card p {
+    font-size: 14.5px;
+    color: var(--gray-500);
+    line-height: 1.6;
+  }
+
+  /* ===== FOOTER ===== */
+  footer {
+    margin-top: 100px;
+    padding: 36px 0;
+    border-top: 1px solid var(--gray-100);
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  footer p {
+    font-size: 13.5px;
+    color: var(--gray-400);
+  }
+
+  footer strong { color: var(--blue-600); font-weight: 700; }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 640px) {
+    .nav-links { display: none; }
+    .hero { padding: 50px 0 30px; }
+    .compressor { padding: 22px; border-radius: 20px; }
+    .drop-zone { padding: 36px 18px; }
+    .actions { flex-direction: column; }
+    .btn-ghost { flex: 1; }
+    .features { padding: 60px 0 20px; }
+    .image-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+    .toolbar { flex-direction: column; gap: 10px; align-items: stretch; }
+    .modal { border-radius: 16px; max-height: 95vh; }
+    .modal-head, .modal-body, .modal-foot { padding: 16px; }
+    .modal-foot { flex-direction: column; align-items: stretch; }
+    .modal-foot-actions { justify-content: stretch; }
+    .modal-btn { flex: 1; justify-content: center; }
+    .modal-title { max-width: 70%; font-size: 15px; }
+    .compare-handle::before { width: 36px; height: 36px; }
+    .compare-handle::after { font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav>
+    <div class="nav-inner">
+      <a href="#" class="logo">
+        <div class="logo-mark">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h9"/>
+            <path d="m21 15-5-5L5 21"/>
+            <circle cx="8.5" cy="8.5" r="1.5"/>
+          </svg>
+        </div>
+        Img-Compressor <span>Flex</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#compress" class="nav-cta">Compress Now</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" id="compress">
+    <div class="container">
+      <div class="badge">
+        <span class="dot"></span>
+        100% Private · Click any image to compare before/after
+      </div>
+      <h1>
+        Compress images <span class="accent">professionally</span>,<br>
+        right in your browser.
+      </h1>
+      <p>
+        Batch compression, resize, format conversion, target size — plus an
+        interactive before/after preview to see the difference.
+      </p>
+
+      <!-- COMPRESSOR CARD -->
+      <div class="compressor">
+        <label class="drop-zone" id="dropZone">
+          <input type="file" id="fileInput" accept="image/*" multiple>
+          <div class="drop-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+          </div>
+          <h3>Drop your images here</h3>
+          <p>or click to browse — multiple files supported</p>
+          <span class="formats">JPG · PNG · WebP · GIF · BMP</span>
+        </label>
+
+        <div class="workspace" id="workspace">
+          <div class="toolbar">
+            <span id="fileCount">0 images loaded</span>
+            <div class="toolbar-actions">
+              <button class="mini-btn" id="addMoreBtn">+ Add More</button>
+              <button class="mini-btn" id="clearAllBtn">Clear All</button>
+            </div>
+          </div>
+
+          <div class="mode-tabs">
+            <button class="mode-tab active" data-mode="simple">Simple</button>
+            <button class="mode-tab" data-mode="advanced">Advanced</button>
+          </div>
+
+          <div id="simpleMode">
+            <div class="field">
+              <label for="simpleQuality">
+                Quality <span id="simpleQualityVal">75%</span>
+              </label>
+              <input type="range" id="simpleQuality" min="10" max="100" value="75">
+            </div>
+            <div class="preset-row">
+              <button class="preset" data-q="30">Maximum Compression (30%)</button>
+              <button class="preset" data-q="55">Balanced (55%)</button>
+              <button class="preset active" data-q="75">High Quality (75%)</button>
+              <button class="preset" data-q="92">Best Quality (92%)</button>
+            </div>
+          </div>
+
+          <div id="advancedMode" style="display:none;">
+            <div class="settings">
+              <div class="field">
+                <label for="advQuality">
+                  Quality <span id="advQualityVal">75%</span>
+                </label>
+                <input type="range" id="advQuality" min="10" max="100" value="75">
+              </div>
+
+              <div class="field">
+                <label for="outFormat">Output Format</label>
+                <select id="outFormat">
+                  <option value="image/jpeg">JPEG (best compatibility)</option>
+                  <option value="image/webp">WebP (best compression)</option>
+                  <option value="image/png">PNG (lossless, larger)</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="maxWidth">Max Width (px)</label>
+                <input type="number" id="maxWidth" placeholder="Leave empty for original" min="50" max="10000">
+              </div>
+
+              <div class="field">
+                <label for="maxHeight">Max Height (px)</label>
+                <input type="number" id="maxHeight" placeholder="Leave empty for original" min="50" max="10000">
+              </div>
+
+              <div class="field">
+                <label>Target Size (optional)</label>
+                <div class="field-row">
+                  <input type="number" id="targetSize" placeholder="e.g. 500" min="10" max="50000">
+                  <span class="unit">KB</span>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="namingPattern">Naming Pattern</label>
+                <select id="namingPattern">
+                  <option value="suffix">name-compressed.jpg</option>
+                  <option value="prefix">compressed-name.jpg</option>
+                  <option value="original">name.jpg (overwrite concept)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="info-note">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="16" x2="12" y2="12"/>
+                <line x1="12" y1="8" x2="12.01" y2="8"/>
+              </svg>
+              <span><b>Target Size</b> mode automatically adjusts quality to hit your desired size. Click any image to compare before/after side by side.</span>
+            </div>
+          </div>
+
+          <div class="image-grid" id="imageGrid"></div>
+
+          <div class="totals">
+            <div class="total-card">
+              <div class="total-label">Original Total</div>
+              <div class="total-value" id="totalOrig">—</div>
+            </div>
+            <div class="total-card highlight">
+              <div class="total-label">Compressed Total</div>
+              <div class="total-value" id="totalComp">—</div>
+            </div>
+            <div class="total-card">
+              <div class="total-label">Total Saved</div>
+              <div class="total-value" id="totalSaved">—</div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn btn-primary" id="downloadAllBtn" disabled>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              Download All
+            </button>
+            <button class="btn btn-ghost" id="downloadZipBtn" disabled>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 8v13H3V8"/>
+                <path d="M1 3h22v5H1z"/>
+                <path d="M10 12h4"/>
+              </svg>
+              Download as ZIP
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features" id="features">
+    <div class="container">
+      <div class="section-head">
+        <h2>Packed with pro tools</h2>
+        <p>Everything you need to shrink images — nothing you don't.</p>
+      </div>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7"/>
+              <rect x="14" y="3" width="7" height="7"/>
+              <rect x="14" y="14" width="7" height="7"/>
+              <rect x="3" y="14" width="7" height="7"/>
+            </svg>
+          </div>
+          <h3>Batch Processing</h3>
+          <p>Drop dozens of images at once. Compress, preview, and download them all together.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <line x1="12" y1="3" x2="12" y2="21"/>
+              <polyline points="8 10 4 14 8 18"/>
+              <polyline points="16 10 20 14 16 18"/>
+            </svg>
+          </div>
+          <h3>Before / After View</h3>
+          <p>Click any image to open an interactive slider that reveals the difference side by side.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="15 3 21 3 21 9"/>
+              <polyline points="9 21 3 21 3 15"/>
+              <line x1="21" y1="3" x2="14" y2="10"/>
+              <line x1="3" y1="21" x2="10" y2="14"/>
+            </svg>
+          </div>
+          <h3>Resize & Convert</h3>
+          <p>Set max width/height, convert between JPEG, WebP, and PNG — all in one pass.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <circle cx="12" cy="12" r="6"/>
+              <circle cx="12" cy="12" r="2"/>
+            </svg>
+          </div>
+          <h3>Target Size Mode</h3>
+          <p>Need exactly 500 KB? Set target size and we auto-tune quality to hit it.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 8v13H3V8"/>
+              <path d="M1 3h22v5H1z"/>
+              <path d="M10 12h4"/>
+            </svg>
+          </div>
+          <h3>ZIP Download</h3>
+          <p>Grab all compressed images as a single ZIP file — perfect for sharing or archiving.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </div>
+          <h3>100% Private</h3>
+          <p>Your images never leave your device. Everything is processed locally in your browser.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <p>Made with <strong>♥</strong> by Img-Compressor Flex · No uploads, no tracking, no nonsense.</p>
+    </div>
+  </footer>
+
+  <!-- ==========================================================
+       COMPARISON MODAL
+  ========================================================== -->
+  <div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-head">
+        <div class="modal-title" id="modalTitle">image.jpg</div>
+        <button class="modal-close" id="modalClose" aria-label="Close">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="compare-wrap" id="compareWrap">
+          <img class="compare-before" id="compareBefore" alt="original">
+          <img class="compare-after" id="compareAfter" alt="compressed">
+          <div class="compare-label before">Original</div>
+          <div class="compare-label after">Compressed</div>
+          <div class="compare-handle" id="compareHandle"></div>
+        </div>
+
+        <div class="modal-stats">
+          <div class="modal-stat">
+            <div class="modal-stat-label">Original Size</div>
+            <div class="modal-stat-value" id="statOrig">—</div>
+          </div>
+          <div class="modal-stat highlight">
+            <div class="modal-stat-label">Compressed</div>
+            <div class="modal-stat-value" id="statComp">—</div>
+          </div>
+          <div class="modal-stat">
+            <div class="modal-stat-label">Saved</div>
+            <div class="modal-stat-value saving" id="statSaved">—</div>
+          </div>
+          <div class="modal-stat">
+            <div class="modal-stat-label">Dimensions</div>
+            <div class="modal-stat-value" id="statDims">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-foot">
+        <div class="modal-foot-info">
+          Drag the slider to compare · <span id="modalFormatInfo"></span>
+        </div>
+        <div class="modal-foot-actions">
+          <div class="zoom-controls">
+            <button class="zoom-btn" id="zoomOut" title="Zoom out">−</button>
+            <span class="zoom-level" id="zoomLevel">100%</span>
+            <button class="zoom-btn" id="zoomIn" title="Zoom in">+</button>
+            <button class="zoom-btn" id="zoomReset" title="Reset zoom" style="font-size:12px;">⟲</button>
+          </div>
+          <button class="modal-btn ghost" id="modalDownload">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Download
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* ==========================================================
+   STATE
+========================================================== */
+const state = {
+  images: [],
+  mode: 'simple',
+  nextId: 1,
+  activeModalId: null,
+  zoom: 1,
+  sliderPct: 50,
+};
+
+/* ==========================================================
+   DOM REFS
+========================================================== */
+const dropZone       = document.getElementById('dropZone');
+const fileInput      = document.getElementById('fileInput');
+const workspace      = document.getElementById('workspace');
+const imageGrid      = document.getElementById('imageGrid');
+const fileCountEl    = document.getElementById('fileCount');
+const addMoreBtn     = document.getElementById('addMoreBtn');
+const clearAllBtn    = document.getElementById('clearAllBtn');
+const downloadAllBtn = document.getElementById('downloadAllBtn');
+const downloadZipBtn = document.getElementById('downloadZipBtn');
+const totalOrigEl    = document.getElementById('totalOrig');
+const totalCompEl    = document.getElementById('totalComp');
+const totalSavedEl   = document.getElementById('totalSaved');
+
+const simpleQuality    = document.getElementById('simpleQuality');
+const simpleQualityVal = document.getElementById('simpleQualityVal');
+
+const advQuality    = document.getElementById('advQuality');
+const advQualityVal = document.getElementById('advQualityVal');
+const outFormat     = document.getElementById('outFormat');
+const maxWidth      = document.getElementById('maxWidth');
+const maxHeight     = document.getElementById('maxHeight');
+const targetSize    = document.getElementById('targetSize');
+const namingPattern = document.getElementById('namingPattern');
+
+// Modal
+const modalBackdrop   = document.getElementById('modalBackdrop');
+const modalClose      = document.getElementById('modalClose');
+const modalTitle      = document.getElementById('modalTitle');
+const compareWrap     = document.getElementById('compareWrap');
+const compareBefore   = document.getElementById('compareBefore');
+const compareAfter    = document.getElementById('compareAfter');
+const compareHandle   = document.getElementById('compareHandle');
+const statOrig        = document.getElementById('statOrig');
+const statComp        = document.getElementById('statComp');
+const statSaved       = document.getElementById('statSaved');
+const statDims        = document.getElementById('statDims');
+const modalFormatInfo = document.getElementById('modalFormatInfo');
+const modalDownload   = document.getElementById('modalDownload');
+const zoomIn          = document.getElementById('zoomIn');
+const zoomOut         = document.getElementById('zoomOut');
+const zoomReset       = document.getElementById('zoomReset');
+const zoomLevel       = document.getElementById('zoomLevel');
+
+/* ==========================================================
+   UTILITIES
+========================================================== */
+function formatSize(bytes) {
+  if (!bytes && bytes !== 0) return '—';
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+}
+
+function updateSliderFill(slider) {
+  const pct = ((slider.value - slider.min) / (slider.max - slider.min)) * 100;
+  slider.style.background =
+    `linear-gradient(90deg, var(--blue-600) 0%, var(--blue-600) ${pct}%, var(--gray-100) ${pct}%, var(--gray-100) 100%)`;
+}
+
+function getExtension(mimeType) {
+  if (mimeType === 'image/webp') return '.webp';
+  if (mimeType === 'image/png') return '.png';
+  return '.jpg';
+}
+
+function buildFileName(originalName, mimeType) {
+  const base = originalName.replace(/\.[^.]+$/, '');
+  const ext = getExtension(mimeType);
+  const pattern = namingPattern.value;
+  if (pattern === 'prefix') return 'compressed-' + base + ext;
+  if (pattern === 'original') return base + ext;
+  return base + '-compressed' + ext;
+}
+
+/* ==========================================================
+   FILE HANDLING
+========================================================== */
+fileInput.addEventListener('change', e => {
+  if (e.target.files.length) addFiles(Array.from(e.target.files));
+  fileInput.value = '';
+});
+
+['dragenter', 'dragover'].forEach(evt => {
+  dropZone.addEventListener(evt, e => {
+    e.preventDefault();
+    dropZone.classList.add('dragover');
+  });
+});
+['dragleave', 'drop'].forEach(evt => {
+  dropZone.addEventListener(evt, e => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+  });
+});
+dropZone.addEventListener('drop', e => {
+  const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+  if (files.length) addFiles(files);
+});
+
+addMoreBtn.addEventListener('click', () => fileInput.click());
+clearAllBtn.addEventListener('click', clearAll);
+
+async function addFiles(files) {
+  const imageFiles = files.filter(f => f.type.startsWith('image/'));
+  if (!imageFiles.length) {
+    alert('Please upload image files only.');
+    return;
+  }
+
+  workspace.classList.add('active');
+
+  for (const file of imageFiles) {
+    const img = {
+      id: state.nextId++,
+      file,
+      name: file.name,
+      originalSize: file.size,
+      compressedBlob: null,
+      compressedSize: 0,
+      originalUrl: URL.createObjectURL(file),
+      compressedUrl: null,
+      width: 0,
+      height: 0,
+      outWidth: 0,
+      outHeight: 0,
+    };
+    state.images.push(img);
+
+    const dims = await getImageDimensions(file);
+    img.width = dims.width;
+    img.height = dims.height;
+
+    renderCard(img);
+  }
+
+  updateFileCount();
+  processAll();
+  workspace.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function getImageDimensions(file) {
+  return new Promise(resolve => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      resolve({ width: img.width, height: img.height });
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      resolve({ width: 0, height: 0 });
+    };
+    img.src = url;
+  });
+}
+
+function renderCard(img) {
+  const card = document.createElement('div');
+  card.className = 'image-card';
+  card.dataset.id = img.id;
+
+  card.innerHTML = `
+    <button class="remove-btn" data-id="${img.id}" title="Remove">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"/>
+        <line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+    <div class="image-thumb-wrap">
+      <img class="image-thumb" src="${img.originalUrl}" alt="">
+      <div class="image-thumb-overlay">
+        <span class="compare-hint">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <line x1="12" y1="3" x2="12" y2="21"/>
+          </svg>
+          Click to compare
+        </span>
+      </div>
+    </div>
+    <div class="image-info">
+      <div class="name" title="${img.name}">${img.name}</div>
+      <div class="size-row">
+        <span>Original</span>
+        <span class="val">${formatSize(img.originalSize)}</span>
+      </div>
+      <div class="size-row">
+        <span>Compressed</span>
+        <span class="new-val" data-role="comp-size">…</span>
+      </div>
+      <div data-role="savings-wrap"></div>
+    </div>
+  `;
+
+  card.querySelector('.remove-btn').addEventListener('click', e => {
+    e.stopPropagation();
+    removeImage(img.id);
+  });
+
+  card.addEventListener('click', () => openModal(img.id));
+
+  imageGrid.appendChild(card);
+}
+
+function updateCard(img) {
+  const card = imageGrid.querySelector(`[data-id="${img.id}"]`);
+  if (!card) return;
+
+  const compSizeEl = card.querySelector('[data-role="comp-size"]');
+  compSizeEl.textContent = formatSize(img.compressedSize);
+
+  const savingsWrap = card.querySelector('[data-role="savings-wrap"]');
+  const savedPct = ((img.originalSize - img.compressedSize) / img.originalSize) * 100;
+  if (savedPct > 0) {
+    savingsWrap.innerHTML = `<span class="savings good">−${savedPct.toFixed(1)}% smaller</span>`;
+  } else {
+    savingsWrap.innerHTML = `<span class="savings bad">+${Math.abs(savedPct).toFixed(1)}% larger</span>`;
+  }
+}
+
+function removeImage(id) {
+  const idx = state.images.findIndex(i => i.id === id);
+  if (idx === -1) return;
+  const img = state.images[idx];
+  if (img.originalUrl) URL.revokeObjectURL(img.originalUrl);
+  if (img.compressedUrl) URL.revokeObjectURL(img.compressedUrl);
+  state.images.splice(idx, 1);
+
+  const card = imageGrid.querySelector(`[data-id="${id}"]`);
+  if (card) card.remove();
+
+  updateFileCount();
+  updateTotals();
+
+  if (state.images.length === 0) workspace.classList.remove('active');
+}
+
+function clearAll() {
+  state.images.forEach(img => {
+    if (img.originalUrl) URL.revokeObjectURL(img.originalUrl);
+    if (img.compressedUrl) URL.revokeObjectURL(img.compressedUrl);
+  });
+  state.images = [];
+  imageGrid.innerHTML = '';
+  workspace.classList.remove('active');
+  fileInput.value = '';
+  updateTotals();
+  closeModal();
+}
+
+function updateFileCount() {
+  const n = state.images.length;
+  fileCountEl.textContent = n + ' image' + (n === 1 ? '' : 's') + ' loaded';
+}
+
+/* ==========================================================
+   MODE SWITCHING
+========================================================== */
+document.querySelectorAll('.mode-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    state.mode = tab.dataset.mode;
+    document.getElementById('simpleMode').style.display = state.mode === 'simple' ? 'block' : 'none';
+    document.getElementById('advancedMode').style.display = state.mode === 'advanced' ? 'block' : 'none';
+    processAll();
+  });
+});
+
+/* ==========================================================
+   SETTINGS LISTENERS
+========================================================== */
+simpleQuality.addEventListener('input', () => {
+  simpleQualityVal.textContent = simpleQuality.value + '%';
+  updateSliderFill(simpleQuality);
+  advQuality.value = simpleQuality.value;
+  advQualityVal.textContent = simpleQuality.value + '%';
+  updateSliderFill(advQuality);
+  document.querySelectorAll('.preset').forEach(p => {
+    p.classList.toggle('active', parseInt(p.dataset.q) === parseInt(simpleQuality.value));
+  });
+  debouncedProcessAll();
+});
+
+document.querySelectorAll('.preset').forEach(preset => {
+  preset.addEventListener('click', () => {
+    const q = parseInt(preset.dataset.q);
+    simpleQuality.value = q;
+    advQuality.value = q;
+    simpleQualityVal.textContent = q + '%';
+    advQualityVal.textContent = q + '%';
+    updateSliderFill(simpleQuality);
+    updateSliderFill(advQuality);
+    document.querySelectorAll('.preset').forEach(p => p.classList.remove('active'));
+    preset.classList.add('active');
+    processAll();
+  });
+});
+
+advQuality.addEventListener('input', () => {
+  advQualityVal.textContent = advQuality.value + '%';
+  updateSliderFill(advQuality);
+  simpleQuality.value = advQuality.value;
+  simpleQualityVal.textContent = advQuality.value + '%';
+  updateSliderFill(simpleQuality);
+  debouncedProcessAll();
+});
+
+outFormat.addEventListener('change', processAll);
+maxWidth.addEventListener('change', processAll);
+maxHeight.addEventListener('change', processAll);
+targetSize.addEventListener('change', processAll);
+namingPattern.addEventListener('change', updateTotals);
+
+let debounceTimer = null;
+function debouncedProcessAll() {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(processAll, 180);
+}
+
+/* ==========================================================
+   CORE COMPRESSION
+========================================================== */
+async function processAll() {
+  if (state.images.length === 0) return;
+  await Promise.all(state.images.map(img => processOne(img)));
+  updateTotals();
+
+  // If modal is open, refresh the modal view
+  if (state.activeModalId) {
+    const img = state.images.find(i => i.id === state.activeModalId);
+    if (img && img.compressedUrl) refreshModal(img);
+  }
+}
+
+function processOne(img) {
+  return new Promise(resolve => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const sourceImg = new Image();
+      sourceImg.onload = async () => {
+        let targetW = sourceImg.width;
+        let targetH = sourceImg.height;
+
+        const mw = parseInt(maxWidth.value) || 0;
+        const mh = parseInt(maxHeight.value) || 0;
+
+        if (mw && targetW > mw) {
+          const ratio = mw / targetW;
+          targetW = mw;
+          targetH = Math.round(targetH * ratio);
+        }
+        if (mh && targetH > mh) {
+          const ratio = mh / targetH;
+          targetH = mh;
+          targetW = Math.round(targetW * ratio);
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = targetW;
+        canvas.height = targetH;
+        const ctx = canvas.getContext('2d');
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+
+        const format = state.mode === 'advanced' ? outFormat.value : 'image/jpeg';
+        if (format === 'image/jpeg') {
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, targetW, targetH);
+        }
+        ctx.drawImage(sourceImg, 0, 0, targetW, targetH);
+
+        const quality = (state.mode === 'advanced'
+          ? parseInt(advQuality.value)
+          : parseInt(simpleQuality.value)) / 100;
+
+        const targetKB = state.mode === 'advanced' ? parseFloat(targetSize.value) : 0;
+
+        let blob;
+        if (targetKB > 0 && format !== 'image/png') {
+          blob = await hitTargetSize(canvas, format, targetKB * 1024);
+        } else {
+          blob = await canvasToBlob(canvas, format, quality);
+        }
+
+        if (!blob) {
+          resolve();
+          return;
+        }
+
+        if (img.compressedUrl) URL.revokeObjectURL(img.compressedUrl);
+        img.compressedBlob = blob;
+        img.compressedSize = blob.size;
+        img.compressedUrl = URL.createObjectURL(blob);
+        img.outWidth = targetW;
+        img.outHeight = targetH;
+
+        updateCard(img);
+        resolve();
+      };
+      sourceImg.onerror = () => resolve();
+      sourceImg.src = e.target.result;
+    };
+    reader.onerror = () => resolve();
+    reader.readAsDataURL(img.file);
+  });
+}
+
+function canvasToBlob(canvas, mimeType, quality) {
+  return new Promise(resolve => {
+    canvas.toBlob(blob => resolve(blob), mimeType, quality);
+  });
+}
+
+async function hitTargetSize(canvas, mimeType, targetBytes) {
+  let low = 0.05;
+  let high = 0.98;
+  let bestBlob = null;
+  let bestDiff = Infinity;
+
+  for (let i = 0; i < 8; i++) {
+    const mid = (low + high) / 2;
+    const blob = await canvasToBlob(canvas, mimeType, mid);
+    if (!blob) break;
+    const diff = Math.abs(blob.size - targetBytes);
+    if (diff < bestDiff) {
+      bestDiff = diff;
+      bestBlob = blob;
+    }
+    if (blob.size > targetBytes) high = mid;
+    else low = mid;
+    if (diff / targetBytes < 0.05) break;
+  }
+  return bestBlob;
+}
+
+/* ==========================================================
+   TOTALS
+========================================================== */
+function updateTotals() {
+  const orig = state.images.reduce((sum, i) => sum + i.originalSize, 0);
+  const comp = state.images.reduce((sum, i) => sum + (i.compressedSize || 0), 0);
+  const saved = orig - comp;
+
+  totalOrigEl.textContent = formatSize(orig);
+  totalCompEl.textContent = comp > 0 ? formatSize(comp) : '—';
+
+  if (comp > 0 && orig > 0) {
+    const pct = ((saved) / orig) * 100;
+    if (pct >= 0) {
+      totalSavedEl.textContent = pct.toFixed(1) + '%';
+      totalSavedEl.style.color = 'var(--green-600)';
+    } else {
+      totalSavedEl.textContent = '+' + Math.abs(pct).toFixed(1) + '%';
+      totalSavedEl.style.color = 'var(--amber-700)';
+    }
+  } else {
+    totalSavedEl.textContent = '—';
+    totalSavedEl.style.color = '';
+  }
+
+  const ready = state.images.filter(i => i.compressedBlob).length;
+  downloadAllBtn.disabled = ready === 0;
+  downloadZipBtn.disabled = ready === 0;
+
+  if (ready > 1) {
+    downloadAllBtn.innerHTML = `
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      Download All (${ready})`;
+  } else {
+    downloadAllBtn.innerHTML = `
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      Download All`;
+  }
+}
+
+/* ==========================================================
+   MODAL — BEFORE / AFTER COMPARISON
+========================================================== */
+function openModal(id) {
+  const img = state.images.find(i => i.id === id);
+  if (!img) return;
+
+  // Need compressed data ready
+  if (!img.compressedUrl) {
+    // Wait a tiny bit and try again
+    setTimeout(() => openModal(id), 300);
+    return;
+  }
+
+  state.activeModalId = id;
+  state.zoom = 1;
+  state.sliderPct = 50;
+
+  refreshModal(img);
+  applySlider(state.sliderPct);
+  applyZoom();
+
+  modalBackdrop.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function refreshModal(img) {
+  modalTitle.textContent = img.name;
+  compareBefore.src = img.originalUrl;
+  compareAfter.src = img.compressedUrl;
+
+  statOrig.textContent = formatSize(img.originalSize);
+  statComp.textContent = formatSize(img.compressedSize);
+
+  const savedPct = ((img.originalSize - img.compressedSize) / img.originalSize) * 100;
+  if (savedPct > 0) {
+    statSaved.textContent = '−' + savedPct.toFixed(1) + '%';
+    statSaved.style.color = 'var(--green-600)';
+  } else {
+    statSaved.textContent = '+' + Math.abs(savedPct).toFixed(1) + '%';
+    statSaved.style.color = 'var(--amber-700)';
+  }
+
+  const format = state.mode === 'advanced' ? outFormat.value : 'image/jpeg';
+  const fmtName = format.split('/')[1].toUpperCase();
+  modalFormatInfo.textContent = `Output: ${img.outWidth}×${img.outHeight} · ${fmtName}`;
+  statDims.textContent = `${img.outWidth}×${img.outHeight}`;
+}
+
+function closeModal() {
+  modalBackdrop.classList.remove('active');
+  document.body.style.overflow = '';
+  state.activeModalId = null;
+  state.zoom = 1;
+  applyZoom();
+}
+
+function applySlider(pct) {
+  state.sliderPct = Math.max(0, Math.min(100, pct));
+  compareHandle.style.left = state.sliderPct + '%';
+  compareBefore.style.clipPath = `inset(0 ${100 - state.sliderPct}% 0 0)`;
+  compareAfter.style.clipPath = `inset(0 0 0 ${state.sliderPct}%)`;
+}
+
+function applyZoom() {
+  const z = state.zoom;
+  zoomLevel.textContent = Math.round(z * 100) + '%';
+  compareBefore.style.transform = `scale(${z})`;
+  compareAfter.style.transform = `scale(${z})`;
+  compareBefore.style.transformOrigin = 'center center';
+  compareAfter.style.transformOrigin = 'center center';
+}
+
+// Slider drag on compare area
+let isDragging = false;
+
+function startDrag(e) {
+  isDragging = true;
+  updateSliderFromEvent(e);
+  e.preventDefault();
+}
+
+function updateSliderFromEvent(e) {
+  const rect = compareWrap.getBoundingClientRect();
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const pct = ((clientX - rect.left) / rect.width) * 100;
+  applySlider(pct);
+}
+
+compareWrap.addEventListener('mousedown', startDrag);
+compareWrap.addEventListener('touchstart', startDrag, { passive: false });
+
+window.addEventListener('mousemove', e => {
+  if (isDragging) updateSliderFromEvent(e);
+});
+window.addEventListener('touchmove', e => {
+  if (isDragging) updateSliderFromEvent(e);
+}, { passive: false });
+
+window.addEventListener('mouseup', () => { isDragging = false; });
+window.addEventListener('touchend', () => { isDragging = false; });
+
+// Zoom controls
+zoomIn.addEventListener('click', () => {
+  state.zoom = Math.min(3, state.zoom + 0.25);
+  applyZoom();
+});
+zoomOut.addEventListener('click', () => {
+  state.zoom = Math.max(0.5, state.zoom - 0.25);
+  applyZoom();
+});
+zoomReset.addEventListener('click', () => {
+  state.zoom = 1;
+  applyZoom();
+});
+
+// Close modal
+modalClose.addEventListener('click', closeModal);
+modalBackdrop.addEventListener('click', e => {
+  if (e.target === modalBackdrop) closeModal();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && state.activeModalId) closeModal();
+});
+
+// Modal download
+modalDownload.addEventListener('click', () => {
+  if (!state.activeModalId) return;
+  const img = state.images.find(i => i.id === state.activeModalId);
+  if (!img || !img.compressedBlob) return;
+  downloadBlob(img);
+});
+
+/* ==========================================================
+   DOWNLOADS
+========================================================== */
+downloadAllBtn.addEventListener('click', () => {
+  const ready = state.images.filter(i => i.compressedBlob);
+  ready.forEach((img, i) => {
+    setTimeout(() => downloadBlob(img), i * 120);
+  });
+});
+
+function downloadBlob(img) {
+  const format = state.mode === 'advanced' ? outFormat.value : 'image/jpeg';
+  const filename = buildFileName(img.name, format);
+  const a = document.createElement('a');
+  a.href = img.compressedUrl;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+/* ==========================================================
+   ZIP DOWNLOAD
+========================================================== */
+downloadZipBtn.addEventListener('click', async () => {
+  const ready = state.images.filter(i => i.compressedBlob);
+  if (ready.length === 0) return;
+
+  downloadZipBtn.disabled = true;
+  const originalLabel = downloadZipBtn.innerHTML;
+  downloadZipBtn.textContent = 'Preparing ZIP…';
+
+  try {
+    if (typeof JSZip === 'undefined') {
+      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js');
+    }
+
+    const zip = new JSZip();
+    const format = state.mode === 'advanced' ? outFormat.value : 'image/jpeg';
+
+    const nameCount = {};
+    ready.forEach(img => {
+      let filename = buildFileName(img.name, format);
+      if (nameCount[filename]) {
+        const base = filename.replace(/\.[^.]+$/, '');
+        const ext = filename.match(/\.[^.]+$/)[0];
+        filename = `${base}-${nameCount[filename]}${ext}`;
+      }
+      nameCount[filename] = (nameCount[filename] || 0) + 1;
+      zip.file(filename, img.compressedBlob);
+    });
+
+    const blob = await zip.generateAsync({ type: 'blob' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'img-compressor-flex-' + Date.now() + '.zip';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1500);
+  } catch (err) {
+    console.error(err);
+    alert('Failed to create ZIP. Try downloading files individually.');
+  } finally {
+    downloadZipBtn.disabled = false;
+    downloadZipBtn.innerHTML = originalLabel;
+  }
+});
+
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = src;
+    s.onload = resolve;
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+
+/* ==========================================================
+   INIT
+========================================================== */
+updateSliderFill(simpleQuality);
+updateSliderFill(advQuality);
+applySlider(50);
+</script>
+</body>
+</html>
